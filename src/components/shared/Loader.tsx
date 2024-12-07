@@ -11,4 +11,4 @@ const loader = () => {
   )
 }
 
-export default loader
+export default loader;
