@@ -2,23 +2,23 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "react-router-dom";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+import { useToast } from "@/hooks/use-toast";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Loader from "@/components/shared/Loader";
 
-import { createUserAccount } from "@/lib/appwrite/api";
 import { SignupValidation } from "@/lib/validation";
+import { useCreateUserAccount, useSignInAccount } from "@/lib/react-query/queriesAndMutations";
 
 const SignupForm = () => {
-  const isLoading = false;
+  const { toast } = useToast()
+
+  const { mutateAsync: createUserAccount, isLoading: isCreatingAccount } = useCreateUserAccount() // Renaming functions to describe function
+  // isLoding => isCreatingUser
+
+  const { mutateAsync: signInAccount, isLoading: isSigningIn } = useSignInAccount();
 
   // Form setup
   const form = useForm<z.infer<typeof SignupValidation>>({
@@ -31,16 +31,30 @@ const SignupForm = () => {
     },
   });
 
+
+
   // Submit handler with error handling
   async function onSubmit(values: z.infer<typeof SignupValidation>) {
-    try {
       const newUser = await createUserAccount(values);
-      console.log("User created successfully:", newUser);
-    } catch (error) {
-      console.error("Error creating user:", error);
-      alert("Failed to create an account. Please try again.");
-    }
-  }
+      
+      if(!newUser) {
+        return toast({
+          title: 'Sign up faild. Please try again.'
+        });
+      }
+
+      const session = await signInAccount({
+        email: values.email,
+        password: values.password,
+      })
+
+      if(!session) {
+        return toast({
+          title: 'Sign up faild. Please try again.'
+        }
+      );
+
+   }
 
   return (
     <Form {...form}>
@@ -116,7 +130,7 @@ const SignupForm = () => {
             />
 
           <Button type="submit" className="shad-button_primary">
-            {isLoading ? (
+            {isCreatingAccount ? (
               <div className="flex-center gap-2">
                 <Loader /> Loading...
               </div>
@@ -139,5 +153,5 @@ const SignupForm = () => {
     </Form>
   );
 };
-
+}
 export default SignupForm;
