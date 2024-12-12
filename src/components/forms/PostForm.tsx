@@ -27,7 +27,10 @@ const PostForm = ({ post }) => {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            username: "",
+            caption: post ? post?.caption : "",
+            file: [],
+            location: post ? post?.location : "",
+            tags: post ? post.tags.join(',') : ''
         },
     })
 
@@ -75,7 +78,7 @@ const PostForm = ({ post }) => {
                     name="location"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel className="sad-form_label">Add Location</FormLabel>
+                            <FormLabel className="shad-form_label">Add Location</FormLabel>
                             <FormControl>
                                 <Input type="text" className="shad-input" />
                             </FormControl>
