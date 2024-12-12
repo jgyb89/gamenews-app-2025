@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button"
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -22,7 +21,7 @@ const formSchema = z.object({
     }),
 })
 
-const PostForm = () => {
+const PostForm = ({ post }) => {
 
     // 1. Define your form.
     const form = useForm<z.infer<typeof formSchema>>({
@@ -62,7 +61,10 @@ const PostForm = () => {
                         <FormItem>
                             <FormLabel className="sad-form_label">Add Photos</FormLabel>
                             <FormControl>
-                                <FileUploader />
+                                <FileUploader 
+                                    fieldChange={field.onChange}
+                                    mediaUrl={post?.imageUrl}
+                                />
                             </FormControl>
                             <FormMessage className="shad-form_message" />
                         </FormItem>
